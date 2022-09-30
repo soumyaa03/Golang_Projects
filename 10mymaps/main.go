@@ -20,6 +20,8 @@ func main() {
 	fmt.Println("list of languages :", languages)
 
 	//loops are interesting in golang
+	for key, value := range languages {
+		fmt.Printf("For Key %v, value is %v \n", key, value)
+	}
 
-	
 }
