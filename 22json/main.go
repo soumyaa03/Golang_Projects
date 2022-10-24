@@ -15,7 +15,7 @@ type course struct {
 
 func main() {
 	fmt.Println("Welcome to Json")
-	EncodeJson()
+	DecodeJson()
 
 }
 
@@ -33,4 +33,37 @@ func EncodeJson() {
 	}
 	fmt.Printf("%s\n", finalJson)
 
+}
+
+func DecodeJson() {
+
+	jsonDataFromWeb := []byte(`
+	{
+		
+        
+			"coursename": "Flutter Bootcamp",
+			"Price": 300,
+			"website": "learnGo.in",
+			"tags": ["flutter","dart"]
+	
+	}`)
+	var devCourse course
+	checkValid := json.Valid(jsonDataFromWeb)
+	if checkValid {
+		fmt.Println("JSON was valid")
+		json.Unmarshal(jsonDataFromWeb, &devCourse)
+		//%#v for printing interfaces
+		fmt.Printf("%#v\n", devCourse)
+	} else {
+		fmt.Println("JSON was not valid")
+	}
+
+	//some cases where we just want to add key value pairs
+	var onlineData map[string]interface{}
+	json.Unmarshal(jsonDataFromWeb, &onlineData)
+	fmt.Printf("%#v\n", onlineData)
+
+	for k, v := range onlineData {
+		fmt.Printf("key is %v and value is %v and type is : %T\n", k, v, v)
+	}
 }
