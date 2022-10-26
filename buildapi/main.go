@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -13,10 +14,11 @@ import (
 
 // model for courses  - file
 type Course struct {
-	CourseId    string
-	CourseName  string
-	CoursePrice int
-	Author      *Author
+	CourseId    string  `json: "courseid"`
+	CourseName  string  `json: "coursename"`
+	CourseCat   string  `json: "coursecategory"`
+	CoursePrice int     `json : "price"`
+	Author      *Author `json: "author"`
 }
 
 type Author struct {
@@ -34,6 +36,24 @@ func (c *Course) IsEmpty() bool {
 }
 
 func main() {
+	fmt.Println("API - Routing")
+	r := mux.NewRouter()
+	courses = append(courses, Course{CourseId: "2",
+		CourseName:  "Golang",
+		CourseCat:   "Backend",
+		CoursePrice: 199,
+		Author: &Author{Fullname: "Soumyaranjan",
+			Website: "Soumya@dev"}})
+
+	r.HandleFunc("/", serveHome).Methods("GET")
+	r.HandleFunc("/courses", getAllCourses).Methods("GET")
+	r.HandleFunc("/course/{id}", getOneCourse).Methods("GET")
+	r.HandleFunc("/course", createOneCourse).Methods("POST")
+	r.HandleFunc("/course/{id}", updateOneCourse).Methods("PUT")
+	r.HandleFunc("/course/{id}", deleteOneCourse).Methods("DELETE")
+
+	//listen to a port
+	log.Fatal(http.ListenAndServe(":4000", r))
 
 }
 
@@ -87,6 +107,8 @@ func createOneCourse(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Please send some data")
 		return
 	}
+	//TODO : check only if title is duplicate
+	//loop , title matches with course.coursename , JSON response
 
 	//generate unique id, string
 	// append course into courses
@@ -134,7 +156,11 @@ func deleteOneCourse(w http.ResponseWriter, r *http.Request) {
 
 		if course.CourseId == params["id"] {
 			courses = append(courses[:index], courses[index+1:]...)
-			break
+			//TODO : send a confirm or deny response
+			json.NewEncoder(w).Encode("Item  deleted")
+			return
 		}
+
 	}
+	json.NewEncoder(w).Encode("Item not found")
 }
